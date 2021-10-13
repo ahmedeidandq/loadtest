@@ -33,10 +33,55 @@
                 </div>
             </div>
 
+            <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label">Company ID</label>
+                <div class="col-sm-10">
+                  <input type="" class="form-control" id="" placeholder="" name="company_id">
+                </div>
+            </div>
+
 
             <input class="btn btn-primary btn-sm" type="submit">
         </form>
         
+        <br>
+        <table class="table table-striped" width="100%">
+            
+            <thead>
+                <th>Company</th>
+                <th>Offices</th>
+                <th>Departments</th>
+                <th>Positions</th>
+                <th>Users</th>
+                <th>Attendance Profiles</th>
+                <th>Holiday Profiles</th>
+                <th>Holidays</th>
+                <th>Sign Ins</th>
+                <th>Penalties</th>
+                <th>Requests</th>
+                
+
+            </thead>
+
+            <tbody>
+                
+                @foreach($companies as $company)
+                <tr>
+                    <td>{!! $company ->id !!}</td>
+                    <td>{!! $company ->offices() ->count() !!}</td>
+                    <td>{!! $company ->departments() ->count() !!}</td>
+                    <td>{!! $company ->positions() ->count() !!}</td>
+                    <td>{!! $company ->users() ->count() !!}</td>
+                    <td>{!! $company ->attProfiles() ->count() !!}</td>
+                    <td>{!! $company ->holidayProfiles() ->count() !!}</td>
+                    <td>{!! $company ->holidays() ->count() !!}</td>
+                    <td>{!! $company ->users() ->join('sign_in', 'sign_in.emp_id', 'users.id') ->count() !!}</td>
+                    <td>{!! $company ->users() ->join('penalties', 'penalties.emp_id', 'users.id') ->count() !!}</td>
+                    <td>{!! $company ->users() ->join('requests', 'requests.emp_id', 'users.id') ->count() !!}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
     </div>
 

@@ -31,7 +31,8 @@ Route::get('/', function () {
     	'user' => User::count() , 
     	'sign_in_out' => SignInOut::count() , 
     	'penalty' => Penalty::count() , 
-    	'request' => Req::count()
+    	'request' => Req::count() , 
+    	'companies' => Company::all()
     ]);
 });
 
@@ -57,16 +58,22 @@ Route::post('/loadtest', function(Request $request) {
 
 
 
-	if (!is_numeric($request ->d_factor)) {
 
-		dd('Should be numiric') ; 
+	$v = \Validator::make($request ->input(), [
+		'd_factor' => 'required|numeric' ,
+		'company_id' => 'required|numeric'
+	]); 
+
+	if ($v ->fails()) {
+
+		dd($v ->errors()) ;
 	}
 
-	// dd($request ->d_factor) ;
-	for ($i = 0; $i < $request  ->d_factor; $i++) {
+	$d_factor = $request ->d_factor ; 
+	for ($i = 0; $i < $d_factor; $i++) {
 
 		$data = array() ;
-		foreach (Company::all() as $company) {
+		foreach (Company::where('id', $request ->company_id) ->get() as $company) {
 
 			$c = $company ->replicate()  ; 
 			$c ->save() ;
@@ -82,8 +89,11 @@ Route::post('/loadtest', function(Request $request) {
 				$data ['office'][$office ->id] = $o ->id ;  
 
 				unset($o) ;
+				unset($office) ;
 
 			}
+
+			unset($company ->offices) ;
 
 			foreach ($company ->departments as $department) {
 
@@ -94,8 +104,11 @@ Route::post('/loadtest', function(Request $request) {
 
 				$data ['department'][$department ->id] = $d ->id ;  
 				unset($d) ;
+				unset($department) ;
 
 			}
+
+			unset($company ->departments) ;
 
 			foreach ($company ->positions as $position) {
 
@@ -106,9 +119,12 @@ Route::post('/loadtest', function(Request $request) {
 
 				$data ['position'][$position ->id] = $p ->id ;  
 				unset($p) ;
+				unset($position) ;
 
 			}
 
+
+			unset($company ->positions) ; 
 
 			foreach ($company ->holidayProfiles as $holidayProfile) {
 
@@ -117,9 +133,10 @@ Route::post('/loadtest', function(Request $request) {
 				$h ->office_id = $data ['office'][$holidayProfile ->office_id] ?? 0 ;
 				$h ->save() ;
 
-				$data ['holidayProfile'][$position ->id] = $h ->id ;  
+				$data ['holidayProfile'][$holidayProfile ->id] = $h ->id ;  
 
 				unset($h) ;
+				unset($holidayProfile) ;
 
 			}
 
@@ -131,10 +148,13 @@ Route::post('/loadtest', function(Request $request) {
 				$h ->office_id = $data ['office'][$holiday ->office_id] ?? 0 ;
 				$h ->save() ;
 
-				$data ['holiday'][$position ->id] = $h ->id ;  
+				$data ['holiday'][$holiday ->id] = $h ->id ;  
 
 				unset($h) ;
+				unset($holiday) ;
 			}
+
+			unset($company ->holidays) ;
 
 			foreach ($company ->attProfiles as $attProfile) {
 
@@ -145,10 +165,13 @@ Route::post('/loadtest', function(Request $request) {
 				$a ->office_id = $data ['office'][$attProfile ->office_id] ?? 0 ;
 				$a ->save() ;
 
-				$data ['attProfile'][$position ->id] = $a ->id ;  
+				$data ['attProfile'][$attProfile ->id] = $a ->id ;  
 				unset($a) ; 
+				unset($attProfile) ; 
 
 			}
+
+			unset($company ->attProfiles) ;
 
 			foreach ($company ->users as $user) {
 
@@ -161,6 +184,7 @@ Route::post('/loadtest', function(Request $request) {
 
 			// $data ['employee'][$position ->id] = $e ->id ;  
 
+				// dump($user ->signIns) ;
 				foreach ($user ->signIns as $signIn) {
 
 					$s = $signIn ->replicate() ;
@@ -169,17 +193,20 @@ Route::post('/loadtest', function(Request $request) {
 					$data ['signIn'][$signIn ->id] = $s ->id ;  
 
 					unset($s) ;
+					unset($signIn) ;
 
 				}
 
+				// dd() ;
 				foreach ($user ->penalties as $penalty) {
 
 					$p = $penalty ->replicate() ;
-					$p ->emp_id = $penalty ->emp_id ;
+					$p ->emp_id = $e ->id ;
 					$p ->sign_in_id = $data ['signIn'][$penalty ->sign_in_id] ?? null ;
 					$p ->save() ;
 
 					unset($p) ;
+					unset($penalty) ;
 				}
 
 				foreach ($user ->requests as $request) {
@@ -189,17 +216,26 @@ Route::post('/loadtest', function(Request $request) {
 					$r ->sign_in_id = $data ['signIn'][$request ->sign_in_id] ?? null ;
 					$r ->save() ;
 					unset($r) ;
+					unset($request) ;
 
 				}
 
+				unset($e) ;
 				unset($user) ;
 			}
+
+
+			unset($company ->users) ;
 
 		}
 
 		unset($data) ; 
 
 	}
+
+
+	// dd() ;
+	return redirect('/')  ; 
 
 
 }) ;

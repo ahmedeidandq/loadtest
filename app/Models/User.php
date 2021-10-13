@@ -47,7 +47,7 @@ class User extends Authenticatable
 
     public function signIns()
     {
-        return  $this ->hasMany(SignInOut::class) ;
+        return  $this ->hasMany(SignInOut::class, 'emp_id') ;
     }
 
     public function penalties()
