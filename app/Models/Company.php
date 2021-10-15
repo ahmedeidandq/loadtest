@@ -16,6 +16,12 @@ class Company extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'admin_show',
+        'name' ,
+        'logo_id'
+    ] ;
+
     public function offices()
     {
     	return $this ->hasMany(Office::class) ;
