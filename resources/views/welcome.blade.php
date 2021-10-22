@@ -62,6 +62,26 @@
             <input class="btn btn-primary btn-sm" type="submit">
         </form>
 
+
+        <br>
+        <hr>
+        Merge Companies__
+        <br>
+        <form action="mergecompanies_" method="POST">
+            @csrf()
+
+            <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label">Company IDs * Separated by comma</label>
+                <div class="col-sm-10">
+                  <input type="" class="form-control" id="" placeholder="" name="company_ids">
+                </div>
+            </div>
+
+
+            <input class="btn btn-primary btn-sm" type="submit">
+        </form>
+
+
         <table class="table table-striped" width="100%">
             
             <thead>
